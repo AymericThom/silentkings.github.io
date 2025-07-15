@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Silent Kings</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-gray-900 to-gray-800 text-white min-h-screen p-4">
+  <div class="max-w-3xl mx-auto space-y-10">
+    <header class="text-center">
+      <h1 class="text-4xl font-bold mb-2">📘 Silent Kings - Journal des actions</h1>
+      <p class="font-semibold text-lg text-gray-300">Sélectionne une catégorie ci-dessous pour commencer</p>
+    </header>
+
+    <!-- Navigation -->
+    <div class="flex flex-wrap justify-center gap-4 mb-6">
+      <button onclick="showSection('vente')" class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-2xl shadow-lg transition">🛒 Vente</button>
+      <button onclick="showSection('action')" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-2xl shadow-lg transition">🎭 Action Spéciale</button>
+      <button onclick="showSection('arrestation')" class="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-2xl shadow-lg transition">🚓 Arrestation</button>
+    </div>
+
+    <!-- Formulaire Vente -->
+    <form id="vente-form" class="bg-gray-800 p-6 rounded-2xl space-y-4 shadow-xl hidden section">
+      <h2 class="text-2xl font-semibold border-b border-gray-600 pb-2">🛒 Vente d'objets</h2>
+      <input type="text" name="joueur" placeholder="Nom du joueur" required class="w-full p-3 rounded text-black">
+      <select name="item" id="item-select" required class="w-full p-3 rounded text-black">
+        <option value="" disabled selected>Choisir un item</option>
+        <option value="moonshine" data-prix="101" data-img="LIEN_IMAGE_MOONSHINE">Moonshine - 101$</option>
+        <option value="weed" data-prix="88" data-img="LIEN_IMAGE_WEED">Weed - 88$</option>
+      </select>
+      <input type="number" name="quantite" id="quantite" placeholder="Quantité" min="1" required class="w-full p-3 rounded text-black">
+      <div id="item-image" class="my-2"></div>
+      <p class="text-right font-semibold text-green-400">Total: <span id="total-vente">$0</span></p>
+      <button type="submit" class="w-full bg-green-500 hover:bg-green-600 px-4 py-2 rounded-xl font-bold text-lg">✅ Envoyer</button>
+    </form>
+
+    <!-- Formulaire Action spéciale -->
+    <form id="action-form" class="bg-gray-800 p-6 rounded-2xl space-y-4 shadow-xl hidden section">
+      <h2 class="text-2xl font-semibold border-b border-gray-600 pb-2">🎭 Action spéciale</h2>
+      <input type="text" name="joueur" placeholder="Nom du joueur" required class="w-full p-3 rounded text-black">
+      <select name="type" required class="w-full p-3 rounded text-black">
+        <option value="go_fast">Go Fast</option>
+        <option value="vol_voiture">Vol de voiture</option>
+        <option value="vol_sac">Vol de sac à main</option>
+      </select>
+      <input type="number" name="valeur" placeholder="Valeur estimée ($)" required class="w-full p-3 rounded text-black">
+      <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-xl font-bold text-lg">✅ Envoyer</button>
+    </form>
+
+    <!-- Formulaire Arrestation -->
+    <form id="arrestation-form" class="bg-gray-800 p-6 rounded-2xl space-y-4 shadow-xl hidden section">
+      <h2 class="text-2xl font-semibold border-b border-gray-600 pb-2">🚓 Arrestation</h2>
+      <input type="text" name="joueur" placeholder="Nom du joueur" required class="w-full p-3 rounded text-black">
+      <input type="number" name="argent_perdu" placeholder="Argent perdu ($)" class="w-full p-3 rounded text-black">
+      <input type="text" name="objets_perdus" placeholder="Objets perdus (séparés par virgule)" class="w-full p-3 rounded text-black">
+      <input type="number" name="amende" placeholder="Amende reçue ($)" class="w-full p-3 rounded text-black">
+      <button type="submit" class="w-full bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl font-bold text-lg">✅ Envoyer</button>
+    </form>
+  </div>
+
+  <script>
+    const notyf = new Notyf({
+      duration: 3000,
+      position: { x: 'right', y: 'top' },
+      types: [
+        { type: 'success', background: '#4ade80', icon: false },
+        { type: 'error', background: '#f87171', icon: false }
+      ]
+    });
+
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyNcALQl99I2PgrfrIjsKmHXlDOPeimfz0K93O7WBIhTdUg5p5k1HM5o2sfNzVFfdxnHw/exec';
+
+    function showSection(name) {
+      document.querySelectorAll('.section').forEach(section => section.classList.add('hidden'));
+      document.getElementById(`${name}-form`).classList.remove('hidden');
+    }
+
+    // Vente logic
+    const venteForm = document.getElementById('vente-form');
+    const itemSelect = document.getElementById('item-select');
+    const quantiteInput = document.getElementById('quantite');
+    const totalSpan = document.getElementById('total-vente');
+    const itemImage = document.getElementById('item-image');
+
+    function updateTotal() {
+      const selected = itemSelect.options[itemSelect.selectedIndex];
+      const prix = parseFloat(selected.dataset.prix || 0);
+      const quantite = parseInt(quantiteInput.value || 0);
+      const img = selected.dataset.img;
+      totalSpan.textContent = `$${prix * quantite}`;
+      itemImage.innerHTML = img ? `<img src="${img}" alt="item" class="h-20">` : '';
+    }
+
+    itemSelect.addEventListener('change', updateTotal);
+    quantiteInput.addEventListener('input', updateTotal);
+
+    venteForm.addEventListener('submit', e => {
+      e.preventDefault();
+      Swal.fire({
+        title: 'Confirmer la vente ?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Oui, envoyer'
+      }).then(result => {
+        if (result.isConfirmed) {
+          const data = new FormData(venteForm);
+          const item = itemSelect.options[itemSelect.selectedIndex].text;
+          const total = totalSpan.textContent;
+          data.append('type', 'vente');
+          data.append('item_label', item);
+          data.append('total', total);
+
+          fetch(scriptURL, { method: 'POST', body: data })
+            .then(() => {
+              notyf.success('✅ Vente enregistrée');
+              venteForm.reset();
+              totalSpan.textContent = '$0';
+              itemImage.innerHTML = '';
+            })
+            .catch(() => notyf.error('❌ Erreur lors de l\'envoi'));
+        }
+      });
+    });
+
+    // Action spéciale
+    document.getElementById('action-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const form = e.target;
+      Swal.fire({
+        title: 'Confirmer cette action ?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Oui, envoyer'
+      }).then(result => {
+        if (result.isConfirmed) {
+          const data = new FormData(form);
+          data.append('type', 'action');
+
+          fetch(scriptURL, { method: 'POST', body: data })
+            .then(() => {
+              notyf.success('✅ Action enregistrée');
+              form.reset();
+            })
+            .catch(() => notyf.error('❌ Erreur lors de l\'envoi'));
+        }
+      });
+    });
+
+    // Arrestation
+    document.getElementById('arrestation-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const form = e.target;
+      Swal.fire({
+        title: 'Confirmer l\'arrestation ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Oui, envoyer'
+      }).then(result => {
+        if (result.isConfirmed) {
+          const data = new FormData(form);
+          data.append('type', 'arrestation');
+
+          fetch(scriptURL, { method: 'POST', body: data })
+            .then(() => {
+              notyf.success('✅ Arrestation enregistrée');
+              form.reset();
+            })
+            .catch(() => notyf.error('❌ Erreur lors de l\'envoi'));
+        }
+      });
+    });
+  </script>
+</body>
+</html>
