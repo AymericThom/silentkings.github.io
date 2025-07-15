@@ -1,183 +1,123 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Silent Kings</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Silent Kings - Journal RP</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-  </style>
 </head>
-<body class="bg-gradient-to-b from-gray-900 to-gray-800 text-white min-h-screen p-4">
-  <div class="max-w-3xl mx-auto space-y-10">
-    <header class="text-center">
-      <h1 class="text-4xl font-bold mb-2">📘 Silent Kings - Journal des actions</h1>
-      <p class="font-semibold text-lg text-gray-300">Sélectionne une catégorie ci-dessous pour commencer</p>
-    </header>
+<body class="bg-neutral-900 text-white min-h-screen flex flex-col items-center p-6">
 
-    <!-- Navigation -->
-    <div class="flex flex-wrap justify-center gap-4 mb-6">
-      <button onclick="showSection('vente')" class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-2xl shadow-lg transition">🛒 Vente</button>
-      <button onclick="showSection('action')" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-2xl shadow-lg transition">🎭 Action Spéciale</button>
-      <button onclick="showSection('arrestation')" class="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-2xl shadow-lg transition">🚓 Arrestation</button>
+  <h1 class="text-4xl font-bold mb-4">Silent Kings - Journal RP</h1>
+  <p class="font-semibold text-center text-lg mb-6">🔻 Pour chaque action RP, choisissez une catégorie ci-dessous 🔻</p>
+
+  <div class="flex flex-wrap justify-center gap-4 mb-8">
+    <button onclick="showForm('vente')" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl shadow-xl">💰 Vente</button>
+    <button onclick="showForm('action')" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-xl shadow-xl">🚗 Go Fast / Vol</button>
+    <button onclick="showForm('arrestation')" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-xl shadow-xl">🚓 Arrestation</button>
+  </div>
+
+  <form id="form" class="w-full max-w-md hidden bg-neutral-800 p-6 rounded-xl shadow-lg space-y-4">
+    <input type="hidden" name="type" id="formType" />
+
+    <div>
+      <label class="block mb-1 font-semibold">Nom du joueur</label>
+      <input type="text" name="joueur" required class="w-full px-3 py-2 rounded bg-neutral-700 border border-neutral-600"/>
     </div>
 
-    <!-- Formulaire Vente -->
-    <form id="vente-form" class="bg-gray-800 p-6 rounded-2xl space-y-4 shadow-xl hidden section">
-      <h2 class="text-2xl font-semibold border-b border-gray-600 pb-2">🛒 Vente d'objets</h2>
-      <input type="text" name="joueur" placeholder="Nom du joueur" required class="w-full p-3 rounded text-black">
-      <select name="item" id="item-select" required class="w-full p-3 rounded text-black">
-        <option value="" disabled selected>Choisir un item</option>
-        <option value="moonshine" data-prix="101" data-img="LIEN_IMAGE_MOONSHINE">Moonshine - 101$</option>
-        <option value="weed" data-prix="88" data-img="LIEN_IMAGE_WEED">Weed - 88$</option>
+    <div id="venteFields" class="hidden">
+      <label class="block mb-1 font-semibold">Item vendu</label>
+      <select name="item_label" class="w-full px-3 py-2 rounded bg-neutral-700 border border-neutral-600 mb-2">
+        <option value="moonshine">Moonshine</option>
+        <option value="weed">Weed</option>
       </select>
-      <input type="number" name="quantite" id="quantite" placeholder="Quantité" min="1" required class="w-full p-3 rounded text-black">
-      <div id="item-image" class="my-2"></div>
-      <p class="text-right font-semibold text-green-400">Total: <span id="total-vente">$0</span></p>
-      <button type="submit" class="w-full bg-green-500 hover:bg-green-600 px-4 py-2 rounded-xl font-bold text-lg">✅ Envoyer</button>
-    </form>
+      <label class="block mb-1 font-semibold">Quantité</label>
+      <input type="number" name="quantite" class="w-full px-3 py-2 rounded bg-neutral-700 border border-neutral-600 mb-2"/>
+      <label class="block mb-1 font-semibold">Total ($)</label>
+      <input type="number" name="total" class="w-full px-3 py-2 rounded bg-neutral-700 border border-neutral-600"/>
+    </div>
 
-    <!-- Formulaire Action spéciale -->
-    <form id="action-form" class="bg-gray-800 p-6 rounded-2xl space-y-4 shadow-xl hidden section">
-      <h2 class="text-2xl font-semibold border-b border-gray-600 pb-2">🎭 Action spéciale</h2>
-      <input type="text" name="joueur" placeholder="Nom du joueur" required class="w-full p-3 rounded text-black">
-      <select name="type" required class="w-full p-3 rounded text-black">
+    <div id="actionFields" class="hidden">
+      <label class="block mb-1 font-semibold">Type d'action</label>
+      <select name="type_action" class="w-full px-3 py-2 rounded bg-neutral-700 border border-neutral-600 mb-2">
         <option value="go_fast">Go Fast</option>
         <option value="vol_voiture">Vol de voiture</option>
         <option value="vol_sac">Vol de sac à main</option>
       </select>
-      <input type="number" name="valeur" placeholder="Valeur estimée ($)" required class="w-full p-3 rounded text-black">
-      <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-xl font-bold text-lg">✅ Envoyer</button>
-    </form>
+      <label class="block mb-1 font-semibold">Valeur estimée ($)</label>
+      <input type="number" name="valeur" class="w-full px-3 py-2 rounded bg-neutral-700 border border-neutral-600"/>
+    </div>
 
-    <!-- Formulaire Arrestation -->
-    <form id="arrestation-form" class="bg-gray-800 p-6 rounded-2xl space-y-4 shadow-xl hidden section">
-      <h2 class="text-2xl font-semibold border-b border-gray-600 pb-2">🚓 Arrestation</h2>
-      <input type="text" name="joueur" placeholder="Nom du joueur" required class="w-full p-3 rounded text-black">
-      <input type="number" name="argent_perdu" placeholder="Argent perdu ($)" class="w-full p-3 rounded text-black">
-      <input type="text" name="objets_perdus" placeholder="Objets perdus (séparés par virgule)" class="w-full p-3 rounded text-black">
-      <input type="number" name="amende" placeholder="Amende reçue ($)" class="w-full p-3 rounded text-black">
-      <button type="submit" class="w-full bg-red-500 hover:bg-red-600 px-4 py-2 rounded-xl font-bold text-lg">✅ Envoyer</button>
-    </form>
+    <div id="arrestationFields" class="hidden">
+      <label class="block mb-1 font-semibold">Argent perdu ($)</label>
+      <input type="number" name="argent_perdu" class="w-full px-3 py-2 rounded bg-neutral-700 border border-neutral-600 mb-2"/>
+      <label class="block mb-1 font-semibold">Objets perdus</label>
+      <input type="text" name="objets_perdus" class="w-full px-3 py-2 rounded bg-neutral-700 border border-neutral-600 mb-2"/>
+      <label class="block mb-1 font-semibold">Amende reçue ($)</label>
+      <input type="number" name="amende" class="w-full px-3 py-2 rounded bg-neutral-700 border border-neutral-600"/>
+    </div>
+
+    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 py-2 rounded-xl font-bold">✅ Envoyer</button>
+  </form>
+
+  <!-- Spinner plein écran -->
+  <div id="loaderOverlay" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+    <div class="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
   </div>
 
   <script>
-    const notyf = new Notyf({
-      duration: 3000,
-      position: { x: 'right', y: 'top' },
-      types: [
-        { type: 'success', background: '#4ade80', icon: false },
-        { type: 'error', background: '#f87171', icon: false }
-      ]
-    });
-
+    const form = document.getElementById("form");
+    const formTypeInput = document.getElementById("formType");
+    const venteFields = document.getElementById("venteFields");
+    const actionFields = document.getElementById("actionFields");
+    const arrestationFields = document.getElementById("arrestationFields");
+    const loaderOverlay = document.getElementById("loaderOverlay");
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyNcALQl99I2PgrfrIjsKmHXlDOPeimfz0K93O7WBIhTdUg5p5k1HM5o2sfNzVFfdxnHw/exec';
 
-    function showSection(name) {
-      document.querySelectorAll('.section').forEach(section => section.classList.add('hidden'));
-      document.getElementById(`${name}-form`).classList.remove('hidden');
+    function showForm(type) {
+      form.classList.remove("hidden");
+      formTypeInput.value = type;
+      venteFields.classList.add("hidden");
+      actionFields.classList.add("hidden");
+      arrestationFields.classList.add("hidden");
+
+      if (type === "vente") venteFields.classList.remove("hidden");
+      if (type === "action") actionFields.classList.remove("hidden");
+      if (type === "arrestation") arrestationFields.classList.remove("hidden");
     }
 
-    // Vente logic
-    const venteForm = document.getElementById('vente-form');
-    const itemSelect = document.getElementById('item-select');
-    const quantiteInput = document.getElementById('quantite');
-    const totalSpan = document.getElementById('total-vente');
-    const itemImage = document.getElementById('item-image');
-
-    function updateTotal() {
-      const selected = itemSelect.options[itemSelect.selectedIndex];
-      const prix = parseFloat(selected.dataset.prix || 0);
-      const quantite = parseInt(quantiteInput.value || 0);
-      const img = selected.dataset.img;
-      totalSpan.textContent = `$${prix * quantite}`;
-      itemImage.innerHTML = img ? `<img src="${img}" alt="item" class="h-20">` : '';
-    }
-
-    itemSelect.addEventListener('change', updateTotal);
-    quantiteInput.addEventListener('input', updateTotal);
-
-    venteForm.addEventListener('submit', e => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
-      Swal.fire({
-        title: 'Confirmer la vente ?',
+
+      const confirmed = await Swal.fire({
+        title: 'Confirmer ?',
+        text: 'Es-tu sûr de vouloir envoyer ces infos ?',
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Oui, envoyer'
-      }).then(result => {
-        if (result.isConfirmed) {
-          const data = new FormData(venteForm);
-          const item = itemSelect.options[itemSelect.selectedIndex].text;
-          const total = totalSpan.textContent;
-          data.append('type', 'vente');
-          data.append('item_label', item);
-          data.append('total', total);
-
-          fetch(scriptURL, { method: 'POST', body: data })
-            .then(() => {
-              notyf.success('✅ Vente enregistrée');
-              venteForm.reset();
-              totalSpan.textContent = '$0';
-              itemImage.innerHTML = '';
-            })
-            .catch(() => notyf.error('❌ Erreur lors de l\'envoi'));
-        }
+        confirmButtonText: 'Oui, envoyer',
+        cancelButtonText: 'Annuler'
       });
-    });
 
-    // Action spéciale
-    document.getElementById('action-form').addEventListener('submit', e => {
-      e.preventDefault();
-      const form = e.target;
-      Swal.fire({
-        title: 'Confirmer cette action ?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Oui, envoyer'
-      }).then(result => {
-        if (result.isConfirmed) {
-          const data = new FormData(form);
-          data.append('type', 'action');
+      if (confirmed.isConfirmed) {
+        loaderOverlay.classList.remove("hidden");
 
-          fetch(scriptURL, { method: 'POST', body: data })
-            .then(() => {
-              notyf.success('✅ Action enregistrée');
-              form.reset();
-            })
-            .catch(() => notyf.error('❌ Erreur lors de l\'envoi'));
-        }
-      });
-    });
+        const formData = new FormData(form);
 
-    // Arrestation
-    document.getElementById('arrestation-form').addEventListener('submit', e => {
-      e.preventDefault();
-      const form = e.target;
-      Swal.fire({
-        title: 'Confirmer l\'arrestation ?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Oui, envoyer'
-      }).then(result => {
-        if (result.isConfirmed) {
-          const data = new FormData(form);
-          data.append('type', 'arrestation');
-
-          fetch(scriptURL, { method: 'POST', body: data })
-            .then(() => {
-              notyf.success('✅ Arrestation enregistrée');
-              form.reset();
-            })
-            .catch(() => notyf.error('❌ Erreur lors de l\'envoi'));
-        }
-      });
+        fetch(scriptURL, { method: 'POST', body: formData })
+          .then(() => {
+            Swal.fire({ title: 'Envoyé !', icon: 'success', timer: 1500, toast: true, position: 'top' });
+            form.reset();
+            form.classList.add("hidden");
+            loaderOverlay.classList.add("hidden");
+          })
+          .catch(() => {
+            Swal.fire({ title: 'Erreur !', icon: 'error' });
+            loaderOverlay.classList.add("hidden");
+          });
+      }
     });
   </script>
+
 </body>
 </html>
