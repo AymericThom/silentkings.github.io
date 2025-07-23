@@ -113,12 +113,12 @@
         confirmButtonText: 'Valider',
         cancelButtonText: 'Annuler',
         preConfirm: (mdp) => {
-          if (mdp !== '1403206') {
+          if (mdp !== '5678') {
             Swal.showValidationMessage('❌ Mot de passe incorrect');
           }
         }
       }).then((result) => {
-        if (result.isConfirmed && result.value === '1403206') {
+        if (result.isConfirmed && result.value === '5678') {
           showForm('achat');
         }
       });
